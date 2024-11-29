@@ -1,0 +1,25 @@
+name: 'S3 Build Artifact Uploader'
+description: 'Uploads build artifacts to AWS S3'
+inputs:
+  aws-access-key-id:
+    description: 'The AWS Access Key ID for authentication'
+    required: true
+  aws-secret-access-key:
+    description: 'The AWS Secret Access Key for authentication'
+    required: true
+  aws-region:
+    description: 'The AWS region where your S3 bucket is located'
+    required: true
+  s3-bucket-name:
+    description: 'The S3 bucket to upload the build artifact to'
+    required: true
+  project-name:
+    description: 'The name of the project'
+    required: true
+  zip-name:
+    description: 'The name of the zip file to create and upload'
+    required: true
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
