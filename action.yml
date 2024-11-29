@@ -1,5 +1,6 @@
 name: 'S3 Build Artifact Uploader'
 description: 'Uploads build artifacts to AWS S3'
+author: "anilrajrimal"
 inputs:
   aws-access-key-id:
     description: 'The AWS Access Key ID for authentication'

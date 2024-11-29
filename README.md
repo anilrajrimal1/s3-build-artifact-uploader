@@ -45,5 +45,4 @@ This GitHub Action uploads build artifacts (e.g., dist--> zip files) to an AWS S
 3. Run the workflow, and the action will upload the build artifact (ZIP file) to your S3 bucket.
 
 ## License
-
 This GitHub Action is licensed under the MIT License.
