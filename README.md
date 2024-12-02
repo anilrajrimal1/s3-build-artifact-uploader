@@ -18,7 +18,7 @@ This GitHub Action uploads build artifacts (e.g., dist--> zip files) to an AWS S
 
 ```yaml
       - name: Upload Build Artifact to S3
-        uses: anilrajrimal1/s3-build-artifact-uploader@v1
+        uses: anilrajrimal1/s3-build-artifact-uploader@v1.1
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
