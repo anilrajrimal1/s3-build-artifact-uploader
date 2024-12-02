@@ -30,9 +30,10 @@ This GitHub Action uploads build artifacts (e.g., dist--> zip files) to an AWS S
 
 ## How it Works
 
-1. **Build the Project**: You can use any build steps necessary for your project. For example, this could be compiling code, building Docker images, or running a JavaScript build process.
-2. **Create a ZIP File**: The action will automatically create a `.zip` file of the build artifacts (e.g., contents of a `dist/` directory).
-3. **Upload to S3**: The action will upload the created ZIP file to the specified S3 bucket using the credentials provided.
+This action will upload the build artifacts  (dist) -> ZIP file to your S3 bucket. You can customize the zip-name (if you add it as mine, the script will take care of the naming convention as (my-project-1234-1.zip)). 
+- The action uses boto3 to interact with AWS S3.
+- The zipped file will be uploaded to AWS S3.
+- You can download it using my `anilrajrimal1/s3-build-artifact-downloader@v1` action.
 
 ## Usage
 
