@@ -33,7 +33,7 @@ s3_client = boto3.client(
 )
 
 try:
-    s3_key = f'{project_name}/{zip_name}'
+    s3_key = f'{project_name}/{project_name}-{zip_name}'
     s3_client.upload_file(zip_path, s3_bucket_name, s3_key)
     print(f'Successfully uploaded {zip_name} to s3://{s3_bucket_name}/{s3_key}')
 
