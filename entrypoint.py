@@ -13,7 +13,7 @@ zip_name = os.getenv('INPUT_ZIP_NAME')
 
 # Ensure all inputs are provided
 if not all([aws_access_key_id, aws_secret_access_key, aws_region, s3_bucket_name, project_name, zip_name]):
-    raise ValueError("All inputs must be provided")
+    raise ValueError("All inputs (AWS credentials, region, bucket name, project name, zip name) must be available")
 
 # Create a zip file from the 'dist' directory
 build_dir = './dist'
@@ -33,7 +33,9 @@ s3_client = boto3.client(
 )
 
 try:
-    s3_client.upload_file(zip_path, s3_bucket_name, f'{project_name}-{zip_name}')
-    print(f'Successfully uploaded {zip_name} to s3://{s3_bucket_name}/{project_name}-{zip_name}')
+    s3_key = f'{project_name}/{zip_name}'
+    s3_client.upload_file(zip_path, s3_bucket_name, s3_key)
+    print(f'Successfully uploaded {zip_name} to s3://{s3_bucket_name}/{s3_key}')
+
 except NoCredentialsError:
     print("Credentials not available")
