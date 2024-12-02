@@ -7,12 +7,12 @@ This GitHub Action uploads build artifacts (e.g., dist--> zip files) to an AWS S
 
 | **Input**              | **Description**                                                              | **Required** | **Default** |
 |------------------------|------------------------------------------------------------------------------|--------------|-------------|
-| `aws-access-key-id`     | The AWS Access Key ID for authentication.                                    | ✅            | N/A         |
-| `aws-secret-access-key` | The AWS Secret Access Key for authentication.                                | ✅            | N/A         |
-| `aws-region`            | The AWS region where your S3 bucket is located.                              | ✅            | N/A         |
-| `s3-bucket-name`        | The name of the S3 bucket to upload the build artifact to.                    | ✅            | N/A         |
-| `project-name`          | The name of your project (used for organizing the artifact).                 | ✅            | N/A         |
-| `zip-name`              | The name of the zip file to create and upload.                                | ✅            | N/A         |
+| `aws_access_key_id`     | The AWS Access Key ID for authentication.                                    | ✅            | N/A         |
+| `aws_secret_access_key` | The AWS Secret Access Key for authentication.                                | ✅            | N/A         |
+| `aws_region`            | The AWS region where your S3 bucket is located.                              | ✅            | N/A         |
+| `s3_bucket_name`        | The name of the S3 bucket to upload the build artifact to.                    | ✅            | N/A         |
+| `project_name`          | The name of your project (used for organizing the artifact).                 | ✅            | N/A         |
+| `zip_name`              | The name of the zip file to create and upload.                                | ✅            | N/A         |
 
 ## Example Workflow
 
@@ -20,12 +20,12 @@ This GitHub Action uploads build artifacts (e.g., dist--> zip files) to an AWS S
       - name: Upload Build Artifact to S3
         uses: anilrajrimal1/s3-build-artifact-uploader@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          s3-bucket-name: ${{ secrets.S3_BUCKET_NAME }}
-          project-name: my-project
-          zip-name: ${{ github.run_id }}-${{ github.run_number }}.zip #(my-project-1234-1)
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          s3_bucket_name: ${{ secrets.S3_BUCKET_NAME }}
+          project_name: my-project
+          zip_name: ${{ github.run_id }}-${{ github.run_number }}.zip #(my-project-1234-1)
 ```
 
 ## How it Works
