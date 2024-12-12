@@ -37,7 +37,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Upload Build Artifact to S3
-        uses: anilrajrimal1/s3-build-artifact-uploader@v1.0.0
+        uses: anilrajrimal1/s3-build-artifact-uploader@v1.0.1
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -53,7 +53,7 @@ jobs:
 This action will upload the build artifacts  (dist) -> ZIP file to your S3 bucket. You can customize the zip-name (if you add it as mine, the script will take care of the naming convention as (PROJECT_NAME-BRANCH-1234-1.zip)). 
 - The action uses boto3 to interact with AWS S3.
 - The zipped file will be uploaded to AWS S3.
-- You can download it using my `anilrajrimal1/s3-build-artifact-downloader@v1.0.0` action.
+- You can download it using my `anilrajrimal1/s3-build-artifact-downloader@v1.0.1` action.
 
 ## Usage
 
