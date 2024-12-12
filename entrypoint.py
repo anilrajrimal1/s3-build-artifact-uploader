@@ -15,14 +15,30 @@ zip_name = os.getenv('INPUT_ZIP_NAME')
 if not all([aws_access_key_id, aws_secret_access_key, aws_region, s3_bucket_name, project_name, zip_name]):
     raise ValueError("All inputs (AWS credentials, region, bucket name, project name, zip name) must be available")
 
-# Create a zip file from the 'dist' directory
+# Get the current user ID and group ID of the runner
+current_uid = os.getuid()
+current_gid = os.getgid()
+
+# Ensure 'dist/' directory is accessible by the non-root user
 build_dir = './dist'
+if not os.access(build_dir, os.R_OK):
+    raise PermissionError(f"The directory {build_dir} is not readable by the current user")
+
 zip_path = f'./{zip_name}'
 
+# Create the zip file and set correct file permissions
 with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
     for root, dirs, files in os.walk(build_dir):
         for file in files:
-            zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), build_dir))
+            file_path = os.path.join(root, file)
+            
+            os.chmod(file_path, 0o755) 
+            os.chown(file_path, current_uid, current_gid)
+            
+            zipf.write(file_path, os.path.relpath(file_path, build_dir))
+
+os.chmod(zip_path, 0o644)
+os.chown(zip_path, current_uid, current_gid)
 
 # Upload the zip file to S3
 s3_client = boto3.client(
