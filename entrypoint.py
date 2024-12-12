@@ -19,24 +19,25 @@ if not all([aws_access_key_id, aws_secret_access_key, aws_region, s3_bucket_name
 current_uid = os.getuid()
 current_gid = os.getgid()
 
-# Ensure 'dist/' directory is accessible by the non-root user
-build_dir = './dist'
-if not os.access(build_dir, os.R_OK):
-    raise PermissionError(f"The directory {build_dir} is not readable by the current user")
-
+# Ensure the current directory is writable by the current user
 zip_path = f'./{zip_name}'
+if not os.access(os.path.dirname(zip_path), os.W_OK):
+    raise PermissionError(f"The directory for {zip_path} is not writable by the current user")
 
 # Create the zip file and set correct file permissions
 with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-    for root, dirs, files in os.walk(build_dir):
+    for root, dirs, files in os.walk('./dist'):
         for file in files:
             file_path = os.path.join(root, file)
             
+            # Fix permissions for each file in dist/
             os.chmod(file_path, 0o755) 
             os.chown(file_path, current_uid, current_gid)
             
-            zipf.write(file_path, os.path.relpath(file_path, build_dir))
+            # Add file to the zip archive
+            zipf.write(file_path, os.path.relpath(file_path, './dist'))
 
+# Ensure the zip file has the correct permissions
 os.chmod(zip_path, 0o644)
 os.chown(zip_path, current_uid, current_gid)
 

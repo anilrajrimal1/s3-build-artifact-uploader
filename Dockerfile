@@ -1,19 +1,24 @@
 FROM python:3.12-slim
 
-USER root
 RUN apt-get update && apt-get install -y \
     libssl-dev \
     libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r github && useradd -r -m -g github github
-
 WORKDIR /usr/src/app
 
-USER github:github
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
+ENV PIP_USER=0
+ENV PIP_NO_USER=1
+ENV PYTHONUSERBASE=/usr/src/app/.local
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
+RUN chown -R appuser:appgroup /usr/src/app
+
+USER appuser
 
 COPY entrypoint.py .
 
