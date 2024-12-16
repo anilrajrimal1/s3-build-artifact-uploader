@@ -17,14 +17,33 @@ if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" || -z "$AWS_REGION"
   exit 1
 fi
 
+# Get the current user ID and group ID
+CURRENT_UID=$(id -u)
+CURRENT_GID=$(id -g)
+
+# Ensure the current directory is writable by the current user
+ZIP_PATH="./${ZIP_NAME}"
+if [[ ! -w $(dirname "$ZIP_PATH") ]]; then
+  echo "The directory for ${ZIP_PATH} is not writable by the current user" >&2
+  exit 1
+fi
+
 # Create the zip file from the 'dist' directory
 BUILD_DIR="./dist"
-ZIP_PATH="./${ZIP_NAME}"
-
 echo "Creating zip file ${ZIP_PATH} from ${BUILD_DIR}..."
+
+# Create a zip archive of the 'dist' directory
 zip -r "$ZIP_PATH" "$BUILD_DIR"
 
-# Install AWS CLI if not available
+# Set correct permissions for the zip file and files inside 'dist/'
+chmod 644 "$ZIP_PATH"
+chown "$CURRENT_UID:$CURRENT_GID" "$ZIP_PATH"
+
+# Change permissions for files in dist/
+find "$BUILD_DIR" -type f -exec chmod 755 {} \;
+find "$BUILD_DIR" -type f -exec chown "$CURRENT_UID:$CURRENT_GID" {} \;
+
+# Install AWS CLI if it's not already available
 if ! command -v aws &> /dev/null
 then
     echo "AWS CLI not found, installing..."
@@ -38,7 +57,6 @@ export AWS_DEFAULT_REGION="$AWS_REGION"
 
 # Upload the zip file to S3
 S3_KEY="${PROJECT_NAME}/${PROJECT_NAME}-${ZIP_NAME}"
-
 echo "Uploading ${ZIP_PATH} to s3://${S3_BUCKET_NAME}/${S3_KEY}..."
 if aws s3 cp "$ZIP_PATH" "s3://${S3_BUCKET_NAME}/${S3_KEY}"; then
   echo "Successfully uploaded ${ZIP_NAME} to s3://${S3_BUCKET_NAME}/${S3_KEY}"
