@@ -28,22 +28,29 @@ if [[ ! -w $(dirname "$ZIP_PATH") ]]; then
   exit 1
 fi
 
-# Create the zip file from the 'dist' directory
+# Ensure the 'dist' directory exists and is writable
 BUILD_DIR="./dist"
+if [[ ! -d "$BUILD_DIR" || ! -w "$BUILD_DIR" ]]; then
+  echo "The 'dist' directory does not exist or is not writable by the current user" >&2
+  exit 1
+fi
+
 echo "Creating zip file ${ZIP_PATH} from ${BUILD_DIR}..."
 
-# Create a zip archive of the 'dist' directory
 zip -r "$ZIP_PATH" "$BUILD_DIR"
 
 # Set correct permissions for the zip file and files inside 'dist/'
 chmod 644 "$ZIP_PATH"
 chown "$CURRENT_UID:$CURRENT_GID" "$ZIP_PATH"
 
-# Change permissions for files in dist/
-find "$BUILD_DIR" -type f -exec chmod 755 {} \;
+echo "Setting permissions for files in the dist/ directory..."
+find "$BUILD_DIR" -type f -exec chmod 644 {} \;
 find "$BUILD_DIR" -type f -exec chown "$CURRENT_UID:$CURRENT_GID" {} \;
 
-# Install AWS CLI if it's not already available
+find "$BUILD_DIR" -type d -exec chmod 755 {} \;
+find "$BUILD_DIR" -type d -exec chown "$CURRENT_UID:$CURRENT_GID" {} \;
+
+# Install AWS CLI if it's not already available (though it should be in your image)
 if ! command -v aws &> /dev/null
 then
     echo "AWS CLI not found, installing..."
