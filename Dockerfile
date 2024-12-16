@@ -1,18 +1,12 @@
-FROM ubuntu:22.04
+FROM alpine:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
+RUN apk add --no-cache unzip aws-cli
 
-RUN apt-get update && apt-get install -y \
-    unzip \
-    zip \
-    awscli \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /code
 
-WORKDIR /action
+COPY entrypoint.sh /code/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
 
-COPY entrypoint.sh /action/entrypoint.sh
+USER root
 
-RUN chmod +x /action/entrypoint.sh
-
-ENTRYPOINT ["/action/entrypoint.sh"]
+ENTRYPOINT ["/code/entrypoint.sh"]
