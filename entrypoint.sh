@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Ensure script exits on error
+set -e
+
+# Get inputs from environment variables
+AWS_ACCESS_KEY_ID="${INPUT_AWS_ACCESS_KEY_ID}"
+AWS_SECRET_ACCESS_KEY="${INPUT_AWS_SECRET_ACCESS_KEY}"
+AWS_REGION="${INPUT_AWS_REGION}"
+S3_BUCKET_NAME="${INPUT_S3_BUCKET_NAME}"
+PROJECT_NAME="${INPUT_PROJECT_NAME}"
+ZIP_NAME="${INPUT_ZIP_NAME}"
+
+# Ensure all inputs are provided
+if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" || -z "$AWS_REGION" || -z "$S3_BUCKET_NAME" || -z "$PROJECT_NAME" || -z "$ZIP_NAME" ]]; then
+  echo "All inputs (AWS credentials, region, bucket name, project name, zip name) must be available." >&2
+  exit 1
+fi
+
+# Create the zip file from the 'dist' directory
+BUILD_DIR="./dist"
+ZIP_PATH="./${ZIP_NAME}"
+
+echo "Creating zip file ${ZIP_PATH} from ${BUILD_DIR}..."
+zip -r "$ZIP_PATH" "$BUILD_DIR"
+
+# Install AWS CLI if not available
+if ! command -v aws &> /dev/null
+then
+    echo "AWS CLI not found, installing..."
+    apk update && apk add --no-cache aws-cli
+fi
+
+# Set AWS credentials for AWS CLI
+export AWS_ACCESS_KEY_ID
+export AWS_SECRET_ACCESS_KEY
+export AWS_DEFAULT_REGION="$AWS_REGION"
+
+# Upload the zip file to S3
+S3_KEY="${PROJECT_NAME}/${PROJECT_NAME}-${ZIP_NAME}"
+
+echo "Uploading ${ZIP_PATH} to s3://${S3_BUCKET_NAME}/${S3_KEY}..."
+if aws s3 cp "$ZIP_PATH" "s3://${S3_BUCKET_NAME}/${S3_KEY}"; then
+  echo "Successfully uploaded ${ZIP_NAME} to s3://${S3_BUCKET_NAME}/${S3_KEY}"
+else
+  echo "Failed to upload ${ZIP_NAME} to S3" >&2
+  exit 1
+fi
