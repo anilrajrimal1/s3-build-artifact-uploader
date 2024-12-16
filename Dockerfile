@@ -1,11 +1,18 @@
-FROM alpine:latest
+FROM ubuntu:22.04
 
-RUN apk update && apk add --no-cache bash zip aws-cli
+ENV DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /home/anil
+RUN apt-get update && apt-get install -y \
+    unzip \
+    zip \
+    awscli \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY entrypoint.sh /home/anil/entrypoint.sh
+WORKDIR /action
 
-RUN chmod +x /home/anil/entrypoint.sh
+COPY entrypoint.sh /action/entrypoint.sh
 
-CMD ["bash", "/home/anil/entrypoint.sh"]
+RUN chmod +x /action/entrypoint.sh
+
+ENTRYPOINT ["/action/entrypoint.sh"]

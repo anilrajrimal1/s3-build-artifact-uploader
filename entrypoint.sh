@@ -17,17 +17,6 @@ if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" || -z "$AWS_REGION"
   exit 1
 fi
 
-# Get the current user ID and group ID
-CURRENT_UID=$(id -u)
-CURRENT_GID=$(id -g)
-
-# Ensure the current directory is writable by the current user
-ZIP_PATH="./${ZIP_NAME}"
-if [[ ! -w $(dirname "$ZIP_PATH") ]]; then
-  echo "The directory for ${ZIP_PATH} is not writable by the current user" >&2
-  exit 1
-fi
-
 # Ensure the 'dist' directory exists and is writable
 BUILD_DIR="./dist"
 if [[ ! -d "$BUILD_DIR" || ! -w "$BUILD_DIR" ]]; then
@@ -35,20 +24,18 @@ if [[ ! -d "$BUILD_DIR" || ! -w "$BUILD_DIR" ]]; then
   exit 1
 fi
 
+# Create the ZIP file from the dist directory
+ZIP_PATH="./${ZIP_NAME}"
 echo "Creating zip file ${ZIP_PATH} from ${BUILD_DIR}..."
-
 zip -r "$ZIP_PATH" "$BUILD_DIR"
 
-# Set correct permissions for the zip file and files inside 'dist/'
+# Set liberal permissions for the zip file
 chmod 644 "$ZIP_PATH"
-chown "$CURRENT_UID:$CURRENT_GID" "$ZIP_PATH"
 
+# Set permissions for files in the dist/ directory
 echo "Setting permissions for files in the dist/ directory..."
 find "$BUILD_DIR" -type f -exec chmod 644 {} \;
-find "$BUILD_DIR" -type f -exec chown "$CURRENT_UID:$CURRENT_GID" {} \;
-
 find "$BUILD_DIR" -type d -exec chmod 755 {} \;
-find "$BUILD_DIR" -type d -exec chown "$CURRENT_UID:$CURRENT_GID" {} \;
 
 # Install AWS CLI if it's not already available (though it should be in your image)
 if ! command -v aws &> /dev/null
