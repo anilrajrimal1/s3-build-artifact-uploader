@@ -11,43 +11,34 @@ S3_BUCKET_NAME="${INPUT_S3_BUCKET_NAME}"
 PROJECT_NAME="${INPUT_PROJECT_NAME}"
 ZIP_NAME="${INPUT_ZIP_NAME}"
 
-# Ensure all inputs are provided
+# Validate required inputs
 if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" || -z "$AWS_REGION" || -z "$S3_BUCKET_NAME" || -z "$PROJECT_NAME" || -z "$ZIP_NAME" ]]; then
-  echo "All inputs (AWS credentials, region, bucket name, project name, zip name) must be available." >&2
+  echo "All inputs must be provided." >&2
   exit 1
-fi
-
-# Ensure the 'dist' directory exists and is writable
-BUILD_DIR="./dist"
-if [[ ! -d "$BUILD_DIR" || ! -w "$BUILD_DIR" ]]; then
-  echo "The 'dist' directory does not exist or is not writable by the current user" >&2
-  exit 1
-fi
-
-# Create the ZIP file from the dist directory
-ZIP_PATH="./${ZIP_NAME}"
-echo "Creating zip file ${ZIP_PATH} from ${BUILD_DIR}..."
-zip -r "$ZIP_PATH" "$BUILD_DIR"
-
-# Set liberal permissions for the zip file
-chmod 644 "$ZIP_PATH"
-
-# Set permissions for files in the dist/ directory
-echo "Setting permissions for files in the dist/ directory..."
-find "$BUILD_DIR" -type f -exec chmod 644 {} \;
-find "$BUILD_DIR" -type d -exec chmod 755 {} \;
-
-# Install AWS CLI if it's not already available (though it should be in your image)
-if ! command -v aws &> /dev/null
-then
-    echo "AWS CLI not found, installing..."
-    apk update && apk add --no-cache aws-cli
 fi
 
 # Set AWS credentials for AWS CLI
 export AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION="$AWS_REGION"
+
+# Paths
+ZIP_PATH="./${ZIP_NAME}"
+S3_KEY="${PROJECT_NAME}/${PROJECT_NAME}-${ZIP_NAME}"
+BUILD_DIR="./dist"
+
+# Ensure the 'dist' directory exists and is writable
+if [[ ! -d "$BUILD_DIR" || ! -w "$BUILD_DIR" ]]; then
+  echo "The 'dist' directory does not exist or is not writable by the current user" >&2
+  exit 1
+fi
+
+# Create the ZIP file from the dist directory
+echo "Creating zip file ${ZIP_PATH} from ${BUILD_DIR}..."
+zip -r "$ZIP_PATH" "$BUILD_DIR"
+
+# Set liberal permissions for the zip file
+chmod 644 "$ZIP_PATH"
 
 # Upload the zip file to S3
 S3_KEY="${PROJECT_NAME}/${PROJECT_NAME}-${ZIP_NAME}"
