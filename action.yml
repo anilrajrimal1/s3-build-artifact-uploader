@@ -22,18 +22,15 @@ inputs:
     required: true
 
 runs:
-  using: 'composite'
-  steps:
-    - name: Run Bash script
-      shell: bash
-      run: entrypoint.sh
-      env:
-        INPUT_AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
-        INPUT_AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        INPUT_AWS_REGION: ${{ inputs.aws-region }}
-        INPUT_S3_BUCKET_NAME: ${{ inputs.s3-bucket-name }}
-        INPUT_PROJECT_NAME: ${{ inputs.project-name }}
-        INPUT_ZIP_NAME: ${{ inputs.zip-name }}
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.aws-access-key-id }}
+    - ${{ inputs.aws-secret-access-key }}
+    - ${{ inputs.aws-region }}
+    - ${{ inputs.s3-bucket-name }}
+    - ${{ inputs.project-name }}
+    - ${{ inputs.zip-name }}
 
 branding:
   icon: "arrow-up-circle"
