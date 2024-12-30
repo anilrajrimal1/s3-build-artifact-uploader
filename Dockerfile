@@ -7,6 +7,5 @@ RUN apk add --no-cache \
 RUN adduser -D uploader
 USER uploader
 WORKDIR /uploader
-COPY entrypoint.sh /home/uploader/entrypoint.sh
-RUN chmod +x /uploader/entrypoint.sh
-ENTRYPOINT ["bash", "/uploader/entrypoint.sh"]
+COPY . .
+ENTRYPOINT ["bash", "entrypoint.sh"]
